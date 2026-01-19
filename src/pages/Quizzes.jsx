@@ -1,4 +1,4 @@
-import { useState, useMemo, useCallback, useEffect } from 'react';
+import { useState, useMemo, useCallback, useEffect } from "react";
 import {
   quizCategories,
   multipleChoiceNoVi,
@@ -8,19 +8,69 @@ import {
   imageMatching,
   phraseCompletion,
   grammarQuestions,
-} from '../data/quizzes';
-import { useProgress } from '../context/ProgressContext';
-import { useToast } from '../context/ToastContext';
-import { Card, Button, Badge, ProgressBar, Modal } from '../components/UI';
+} from "../data/quizzes";
+import { useProgress } from "../context/ProgressContext";
+import { useLanguage } from "../context/LanguageContext";
+import { useToast } from "../context/ToastContext";
+import { Card, Button, Badge, ProgressBar, Modal } from "../components/UI";
 
 const quizTypes = [
-  { id: 'no-vi', name: 'Norwegian → Vietnamese', nameVi: 'Na Uy → Việt', icon: '🇳🇴➡️🇻🇳', description: 'Translate Norwegian to Vietnamese', questions: multipleChoiceNoVi },
-  { id: 'vi-no', name: 'Vietnamese → Norwegian', nameVi: 'Việt → Na Uy', icon: '🇻🇳➡️🇳🇴', description: 'Translate Vietnamese to Norwegian', questions: multipleChoiceViNo },
-  { id: 'fill', name: 'Fill in the Blanks', nameVi: 'Điền vào chỗ trống', icon: '✏️', description: 'Complete the sentence', questions: fillInTheBlanks },
-  { id: 'construct', name: 'Sentence Construction', nameVi: 'Sắp xếp câu', icon: '🔧', description: 'Arrange words to form sentences', questions: sentenceConstruction },
-  { id: 'image', name: 'Image Matching', nameVi: 'Ghép hình', icon: '🖼️', description: 'Match images with words', questions: imageMatching },
-  { id: 'phrase', name: 'Phrase Completion', nameVi: 'Hoàn thành cụm từ', icon: '💬', description: 'Complete common phrases', questions: phraseCompletion },
-  { id: 'grammar', name: 'Grammar Quiz', nameVi: 'Ngữ pháp', icon: '📝', description: 'Test your grammar knowledge', questions: grammarQuestions },
+  {
+    id: "no-vi",
+    name: "Norwegian → Vietnamese",
+    nameVi: "Na Uy → Việt",
+    icon: "🇳🇴➡️🇻🇳",
+    description: "Translate Norwegian to Vietnamese",
+    questions: multipleChoiceNoVi,
+  },
+  {
+    id: "vi-no",
+    name: "Vietnamese → Norwegian",
+    nameVi: "Việt → Na Uy",
+    icon: "🇻🇳➡️🇳🇴",
+    description: "Translate Vietnamese to Norwegian",
+    questions: multipleChoiceViNo,
+  },
+  {
+    id: "fill",
+    name: "Fill in the Blanks",
+    nameVi: "Điền vào chỗ trống",
+    icon: "✏️",
+    description: "Complete the sentence",
+    questions: fillInTheBlanks,
+  },
+  {
+    id: "construct",
+    name: "Sentence Construction",
+    nameVi: "Sắp xếp câu",
+    icon: "🔧",
+    description: "Arrange words to form sentences",
+    questions: sentenceConstruction,
+  },
+  {
+    id: "image",
+    name: "Image Matching",
+    nameVi: "Ghép hình",
+    icon: "🖼️",
+    description: "Match images with words",
+    questions: imageMatching,
+  },
+  {
+    id: "phrase",
+    name: "Phrase Completion",
+    nameVi: "Hoàn thành cụm từ",
+    icon: "💬",
+    description: "Complete common phrases",
+    questions: phraseCompletion,
+  },
+  {
+    id: "grammar",
+    name: "Grammar Quiz",
+    nameVi: "Ngữ pháp",
+    icon: "📝",
+    description: "Test your grammar knowledge",
+    questions: grammarQuestions,
+  },
 ];
 
 export default function Quizzes() {
@@ -33,6 +83,7 @@ export default function Quizzes() {
   });
 
   const { progress, recordQuizResult } = useProgress();
+  const { t } = useLanguage();
   const { success } = useToast();
 
   const handleStartQuiz = () => {
@@ -43,7 +94,7 @@ export default function Quizzes() {
     recordQuizResult(score, total);
     const percentage = Math.round((score / total) * 100);
     if (percentage === 100) {
-      success('Perfect score! 🎉 +30 points');
+      success("Perfect score! 🎉 +30 points");
     } else if (percentage >= 80) {
       success(`Great job! ${percentage}% correct`);
     } else {
@@ -58,19 +109,23 @@ export default function Quizzes() {
 
   // Calculate stats
   const totalQuizzes = progress.quizzesCompleted;
-  const averageScore = progress.quizScores.length > 0
-    ? Math.round(progress.quizScores.reduce((acc, q) => acc + q.percentage, 0) / progress.quizScores.length)
-    : 0;
+  const averageScore =
+    progress.quizScores.length > 0
+      ? Math.round(
+          progress.quizScores.reduce((acc, q) => acc + q.percentage, 0) /
+            progress.quizScores.length,
+        )
+      : 0;
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       {/* Header */}
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-          Quizzes / Bài kiểm tra 🎯
+          {t("quizzes.title")} 🎯
         </h1>
         <p className="text-gray-600 dark:text-gray-400">
-          Test your Norwegian knowledge with various quiz types
+          {t("quizzes.subtitle")}
         </p>
       </div>
 
@@ -78,16 +133,26 @@ export default function Quizzes() {
       <Card className="p-4 mb-6">
         <div className="flex flex-wrap items-center gap-6">
           <div>
-            <p className="text-sm text-gray-500 dark:text-gray-400">Quizzes Completed</p>
-            <p className="text-xl font-bold text-gray-900 dark:text-white">{totalQuizzes}</p>
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+              Quizzes Completed
+            </p>
+            <p className="text-xl font-bold text-gray-900 dark:text-white">
+              {totalQuizzes}
+            </p>
           </div>
           <div>
-            <p className="text-sm text-gray-500 dark:text-gray-400">Average Score</p>
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+              Average Score
+            </p>
             <p className="text-xl font-bold text-blue-600">{averageScore}%</p>
           </div>
           <div>
-            <p className="text-sm text-gray-500 dark:text-gray-400">Perfect Scores</p>
-            <p className="text-xl font-bold text-green-600">{progress.perfectQuizzes}</p>
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+              Perfect Scores
+            </p>
+            <p className="text-xl font-bold text-green-600">
+              {progress.perfectQuizzes}
+            </p>
           </div>
         </div>
       </Card>
@@ -146,7 +211,13 @@ function QuizTypeCard({ quiz, onSelect }) {
   );
 }
 
-function QuizSettings({ quizType, settings, onSettingsChange, onStart, onBack }) {
+function QuizSettings({
+  quizType,
+  settings,
+  onSettingsChange,
+  onStart,
+  onBack,
+}) {
   const maxQuestions = Math.min(quizType.questions.length, 20);
 
   return (
@@ -175,7 +246,12 @@ function QuizSettings({ quizType, settings, onSettingsChange, onStart, onBack })
               min="5"
               max={maxQuestions}
               value={settings.questionCount}
-              onChange={(e) => onSettingsChange({ ...settings, questionCount: parseInt(e.target.value) })}
+              onChange={(e) =>
+                onSettingsChange({
+                  ...settings,
+                  questionCount: parseInt(e.target.value),
+                })
+              }
               className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700"
             />
             <div className="flex justify-between text-xs text-gray-400 mt-1">
@@ -191,14 +267,16 @@ function QuizSettings({ quizType, settings, onSettingsChange, onStart, onBack })
               <p className="text-sm text-gray-500">Add time pressure</p>
             </div>
             <button
-              onClick={() => onSettingsChange({ ...settings, timer: !settings.timer })}
+              onClick={() =>
+                onSettingsChange({ ...settings, timer: !settings.timer })
+              }
               className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                settings.timer ? 'bg-blue-600' : 'bg-gray-200 dark:bg-gray-700'
+                settings.timer ? "bg-blue-600" : "bg-gray-200 dark:bg-gray-700"
               }`}
             >
               <span
                 className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                  settings.timer ? 'translate-x-6' : 'translate-x-1'
+                  settings.timer ? "translate-x-6" : "translate-x-1"
                 }`}
               />
             </button>
@@ -214,7 +292,12 @@ function QuizSettings({ quizType, settings, onSettingsChange, onStart, onBack })
                 min="2"
                 max="15"
                 value={settings.timerMinutes}
-                onChange={(e) => onSettingsChange({ ...settings, timerMinutes: parseInt(e.target.value) })}
+                onChange={(e) =>
+                  onSettingsChange({
+                    ...settings,
+                    timerMinutes: parseInt(e.target.value),
+                  })
+                }
                 className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700"
               />
             </div>
@@ -247,7 +330,9 @@ function QuizSession({ quizType, settings, onComplete, onBack }) {
   const [showResult, setShowResult] = useState(false);
   const [selectedAnswer, setSelectedAnswer] = useState(null);
   const [isAnswered, setIsAnswered] = useState(false);
-  const [timeLeft, setTimeLeft] = useState(settings.timer ? settings.timerMinutes * 60 : null);
+  const [timeLeft, setTimeLeft] = useState(
+    settings.timer ? settings.timerMinutes * 60 : null,
+  );
   const [quizEnded, setQuizEnded] = useState(false);
 
   // Timer effect
@@ -268,7 +353,9 @@ function QuizSession({ quizType, settings, onComplete, onBack }) {
   }, [settings.timer, quizEnded, timeLeft]);
 
   const currentQuestion = questions[currentIndex];
-  const score = answers.filter((a, i) => a === getCorrectAnswer(questions[i])).length;
+  const score = answers.filter(
+    (a, i) => a === getCorrectAnswer(questions[i]),
+  ).length;
 
   function getCorrectAnswer(question) {
     if (question.correct !== undefined) return question.correct;
@@ -297,24 +384,38 @@ function QuizSession({ quizType, settings, onComplete, onBack }) {
   const handleQuizEnd = () => {
     setQuizEnded(true);
     setShowResult(true);
-    onComplete(score + (isAnswered && selectedAnswer === getCorrectAnswer(currentQuestion) ? 1 : 0), questions.length);
+    onComplete(
+      score +
+        (isAnswered && selectedAnswer === getCorrectAnswer(currentQuestion)
+          ? 1
+          : 0),
+      questions.length,
+    );
   };
 
   const formatTime = (seconds) => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
-    return `${mins}:${secs.toString().padStart(2, '0')}`;
+    return `${mins}:${secs.toString().padStart(2, "0")}`;
   };
 
   if (showResult) {
-    const finalScore = answers.filter((a, i) => a === getCorrectAnswer(questions[i])).length;
+    const finalScore = answers.filter(
+      (a, i) => a === getCorrectAnswer(questions[i]),
+    ).length;
     const percentage = Math.round((finalScore / questions.length) * 100);
 
     return (
       <div className="max-w-xl mx-auto">
         <Card className="p-8 text-center">
           <div className="text-6xl mb-4">
-            {percentage === 100 ? '🏆' : percentage >= 80 ? '🎉' : percentage >= 60 ? '👍' : '📚'}
+            {percentage === 100
+              ? "🏆"
+              : percentage >= 80
+                ? "🎉"
+                : percentage >= 60
+                  ? "👍"
+                  : "📚"}
           </div>
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
             Quiz Complete!
@@ -330,7 +431,9 @@ function QuizSession({ quizType, settings, onComplete, onBack }) {
 
           {/* Results breakdown */}
           <div className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4 mb-6 text-left">
-            <h3 className="font-semibold text-gray-900 dark:text-white mb-3">Results Breakdown</h3>
+            <h3 className="font-semibold text-gray-900 dark:text-white mb-3">
+              Results Breakdown
+            </h3>
             <div className="space-y-2 max-h-48 overflow-y-auto">
               {questions.map((q, i) => {
                 const userAnswer = answers[i];
@@ -342,15 +445,17 @@ function QuizSession({ quizType, settings, onComplete, onBack }) {
                     key={i}
                     className={`p-2 rounded ${
                       isCorrect
-                        ? 'bg-green-100 dark:bg-green-900/30'
-                        : 'bg-red-100 dark:bg-red-900/30'
+                        ? "bg-green-100 dark:bg-green-900/30"
+                        : "bg-red-100 dark:bg-red-900/30"
                     }`}
                   >
                     <p className="text-sm font-medium text-gray-900 dark:text-white">
-                      {i + 1}. {q.question || q.sentence || q.words?.join(' ')}
+                      {i + 1}. {q.question || q.sentence || q.words?.join(" ")}
                     </p>
                     <p className="text-xs text-gray-600 dark:text-gray-400">
-                      {isCorrect ? '✓ Correct' : `✕ Your answer: ${q.options ? q.options[userAnswer] : userAnswer}`}
+                      {isCorrect
+                        ? "✓ Correct"
+                        : `✕ Your answer: ${q.options ? q.options[userAnswer] : userAnswer}`}
                     </p>
                   </div>
                 );
@@ -390,10 +495,14 @@ function QuizSession({ quizType, settings, onComplete, onBack }) {
           ✕ Quit
         </Button>
         <div className="text-center">
-          <p className="text-sm text-gray-500">Question {currentIndex + 1} of {questions.length}</p>
+          <p className="text-sm text-gray-500">
+            Question {currentIndex + 1} of {questions.length}
+          </p>
         </div>
         {settings.timer && (
-          <div className={`font-mono font-bold ${timeLeft < 60 ? 'text-red-500' : 'text-gray-600 dark:text-gray-400'}`}>
+          <div
+            className={`font-mono font-bold ${timeLeft < 60 ? "text-red-500" : "text-gray-600 dark:text-gray-400"}`}
+          >
             ⏱ {formatTime(timeLeft)}
           </div>
         )}
@@ -422,7 +531,9 @@ function QuizSession({ quizType, settings, onComplete, onBack }) {
       {isAnswered && (
         <div className="flex justify-center animate-fadeIn">
           <Button variant="primary" size="lg" onClick={handleNext}>
-            {currentIndex + 1 >= questions.length ? 'See Results' : 'Next Question →'}
+            {currentIndex + 1 >= questions.length
+              ? "See Results"
+              : "Next Question →"}
           </Button>
         </div>
       )}
@@ -430,8 +541,15 @@ function QuizSession({ quizType, settings, onComplete, onBack }) {
   );
 }
 
-function QuestionRenderer({ question, quizType, selectedAnswer, isAnswered, onAnswer }) {
-  const correctAnswer = question.correct !== undefined ? question.correct : question.answer;
+function QuestionRenderer({
+  question,
+  quizType,
+  selectedAnswer,
+  isAnswered,
+  onAnswer,
+}) {
+  const correctAnswer =
+    question.correct !== undefined ? question.correct : question.answer;
 
   // Multiple choice (no-vi, vi-no, phrase, grammar, image)
   if (question.options) {
@@ -439,11 +557,11 @@ function QuestionRenderer({ question, quizType, selectedAnswer, isAnswered, onAn
       <div>
         {/* Question */}
         <div className="text-center mb-6">
-          {quizType === 'image' && (
+          {quizType === "image" && (
             <div className="text-6xl mb-4">{question.description}</div>
           )}
           <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
-            {question.question || question.sentence || 'What is this?'}
+            {question.question || question.sentence || "What is this?"}
           </h3>
           {question.translation && (
             <p className="text-sm text-gray-500 mt-2">{question.translation}</p>
@@ -455,16 +573,19 @@ function QuestionRenderer({ question, quizType, selectedAnswer, isAnswered, onAn
           {question.options.map((option, index) => {
             const isSelected = selectedAnswer === index;
             const isCorrect = index === correctAnswer;
-            let buttonClass = 'p-4 text-left border-2 rounded-lg transition-all ';
+            let buttonClass =
+              "p-4 text-left border-2 rounded-lg transition-all ";
 
             if (!isAnswered) {
-              buttonClass += 'border-gray-200 dark:border-gray-700 hover:border-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/20';
+              buttonClass +=
+                "border-gray-200 dark:border-gray-700 hover:border-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/20";
             } else if (isCorrect) {
-              buttonClass += 'border-green-500 bg-green-50 dark:bg-green-900/20';
+              buttonClass +=
+                "border-green-500 bg-green-50 dark:bg-green-900/20";
             } else if (isSelected && !isCorrect) {
-              buttonClass += 'border-red-500 bg-red-50 dark:bg-red-900/20';
+              buttonClass += "border-red-500 bg-red-50 dark:bg-red-900/20";
             } else {
-              buttonClass += 'border-gray-200 dark:border-gray-700 opacity-50';
+              buttonClass += "border-gray-200 dark:border-gray-700 opacity-50";
             }
 
             return (
@@ -478,7 +599,9 @@ function QuestionRenderer({ question, quizType, selectedAnswer, isAnswered, onAn
                   {option}
                 </span>
                 {isAnswered && isCorrect && <span className="ml-2">✓</span>}
-                {isAnswered && isSelected && !isCorrect && <span className="ml-2">✕</span>}
+                {isAnswered && isSelected && !isCorrect && (
+                  <span className="ml-2">✕</span>
+                )}
               </button>
             );
           })}
@@ -513,7 +636,7 @@ function QuestionRenderer({ question, quizType, selectedAnswer, isAnswered, onAn
 function SentenceConstructionQuestion({ question, isAnswered, onAnswer }) {
   const [arrangedWords, setArrangedWords] = useState([]);
   const [availableWords, setAvailableWords] = useState(() =>
-    [...question.words].sort(() => Math.random() - 0.5)
+    [...question.words].sort(() => Math.random() - 0.5),
   );
 
   const handleWordClick = (word, fromArranged) => {
@@ -531,18 +654,21 @@ function SentenceConstructionQuestion({ question, isAnswered, onAnswer }) {
   };
 
   const handleSubmit = () => {
-    const userAnswer = arrangedWords.join(' ');
+    const userAnswer = arrangedWords.join(" ");
     onAnswer(userAnswer);
   };
 
-  const isCorrect = arrangedWords.join(' ').toLowerCase() === question.correct.toLowerCase();
+  const isCorrect =
+    arrangedWords.join(" ").toLowerCase() === question.correct.toLowerCase();
 
   return (
     <div>
       <h3 className="text-lg font-semibold text-gray-900 dark:text-white text-center mb-2">
         Arrange the words to form a sentence
       </h3>
-      <p className="text-sm text-gray-500 text-center mb-6">{question.translation}</p>
+      <p className="text-sm text-gray-500 text-center mb-6">
+        {question.translation}
+      </p>
 
       {/* Arranged words area */}
       <div className="min-h-[60px] p-3 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg mb-4 flex flex-wrap gap-2">
@@ -554,16 +680,18 @@ function SentenceConstructionQuestion({ question, isAnswered, onAnswer }) {
             className={`px-3 py-1 rounded-lg font-medium transition-all ${
               isAnswered
                 ? isCorrect
-                  ? 'bg-green-500 text-white'
-                  : 'bg-red-500 text-white'
-                : 'bg-blue-500 text-white hover:bg-blue-600'
+                  ? "bg-green-500 text-white"
+                  : "bg-red-500 text-white"
+                : "bg-blue-500 text-white hover:bg-blue-600"
             }`}
           >
             {word}
           </button>
         ))}
         {arrangedWords.length === 0 && (
-          <span className="text-gray-400 text-sm">Click words below to arrange</span>
+          <span className="text-gray-400 text-sm">
+            Click words below to arrange
+          </span>
         )}
       </div>
 

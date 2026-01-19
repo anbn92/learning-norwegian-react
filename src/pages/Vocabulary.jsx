@@ -1,6 +1,7 @@
 import { useState, useMemo } from "react";
 import { vocabulary, vocabularyCategories } from "../data/vocabulary";
 import { useProgress } from "../context/ProgressContext";
+import { useLanguage } from "../context/LanguageContext";
 import { useToast } from "../context/ToastContext";
 import {
   Card,
@@ -20,13 +21,16 @@ export default function Vocabulary() {
   const [viewMode, setViewMode] = useState("browse"); // 'browse' or 'study'
 
   const { progress, markWordLearned, toggleWordFavorite } = useProgress();
+  const { t } = useLanguage();
   const { success } = useToast();
 
   // Filter vocabulary based on search, category, and difficulty
   const filteredVocabulary = useMemo(() => {
     return vocabulary.filter((word) => {
-      const matchesCategory = !selectedCategory || word.category === selectedCategory;
-      const matchesDifficulty = !selectedDifficulty || word.difficulty === selectedDifficulty;
+      const matchesCategory =
+        !selectedCategory || word.category === selectedCategory;
+      const matchesDifficulty =
+        !selectedDifficulty || word.difficulty === selectedDifficulty;
       const matchesSearch =
         !searchQuery ||
         word.norwegian.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -60,10 +64,10 @@ export default function Vocabulary() {
       {/* Header */}
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-          Vocabulary / Từ vựng 📚
+          {t("vocabulary.title")} 📚
         </h1>
         <p className="text-gray-600 dark:text-gray-400">
-          Learn Norwegian words with Vietnamese translations
+          {t("vocabulary.subtitle")}
         </p>
       </div>
 
@@ -72,16 +76,28 @@ export default function Vocabulary() {
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div className="flex items-center space-x-6">
             <div>
-              <p className="text-sm text-gray-500 dark:text-gray-400">Total Words</p>
-              <p className="text-xl font-bold text-gray-900 dark:text-white">{vocabulary.length}</p>
+              <p className="text-sm text-gray-500 dark:text-gray-400">
+                {t("vocabulary.totalWords")}
+              </p>
+              <p className="text-xl font-bold text-gray-900 dark:text-white">
+                {vocabulary.length}
+              </p>
             </div>
             <div>
-              <p className="text-sm text-gray-500 dark:text-gray-400">Learned</p>
-              <p className="text-xl font-bold text-green-600">{progress.wordsLearned.length}</p>
+              <p className="text-sm text-gray-500 dark:text-gray-400">
+                {t("vocabulary.learned")}
+              </p>
+              <p className="text-xl font-bold text-green-600">
+                {progress.wordsLearned.length}
+              </p>
             </div>
             <div>
-              <p className="text-sm text-gray-500 dark:text-gray-400">Favorites</p>
-              <p className="text-xl font-bold text-pink-600">{progress.wordsFavorited.length}</p>
+              <p className="text-sm text-gray-500 dark:text-gray-400">
+                {t("vocabulary.favorites")}
+              </p>
+              <p className="text-xl font-bold text-pink-600">
+                {progress.wordsFavorited.length}
+              </p>
             </div>
           </div>
           <div className="flex items-center space-x-2">
@@ -90,14 +106,14 @@ export default function Vocabulary() {
               size="sm"
               onClick={() => setViewMode("browse")}
             >
-              Browse
+              {t("vocabulary.browse")}
             </Button>
             <Button
               variant={viewMode === "study" ? "primary" : "outline"}
               size="sm"
               onClick={() => setViewMode("study")}
             >
-              Study Mode
+              {t("vocabulary.study")}
             </Button>
           </div>
         </div>
@@ -115,7 +131,7 @@ export default function Vocabulary() {
           onChange={(e) => setSelectedDifficulty(e.target.value || null)}
           className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
         >
-          <option value="">All Levels</option>
+          <option value="">{t("vocabulary.allDifficulties")}</option>
           <option value="beginner">Beginner</option>
           <option value="intermediate">Intermediate</option>
           <option value="advanced">Advanced</option>
@@ -125,7 +141,9 @@ export default function Vocabulary() {
       {/* Category Grid */}
       {!selectedCategory && (
         <div className="mb-8">
-          <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">Categories</h2>
+          <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
+            Categories
+          </h2>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
             {vocabularyCategories.map((category) => (
               <Card
@@ -141,9 +159,12 @@ export default function Vocabulary() {
                 <h3 className="font-medium text-gray-900 dark:text-white text-sm">
                   {category.name}
                 </h3>
-                <p className="text-xs text-gray-500 dark:text-gray-400">{category.nameVi}</p>
+                <p className="text-xs text-gray-500 dark:text-gray-400">
+                  {category.nameVi}
+                </p>
                 <p className="text-xs text-gray-400 mt-1">
-                  {getLearnedCount(category.id)}/{getCategoryCount(category.id)} learned
+                  {getLearnedCount(category.id)}/{getCategoryCount(category.id)}{" "}
+                  learned
                 </p>
               </Card>
             ))}
@@ -155,11 +176,18 @@ export default function Vocabulary() {
       {selectedCategory && (
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center space-x-3">
-            <Button variant="ghost" size="sm" onClick={() => setSelectedCategory(null)}>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setSelectedCategory(null)}
+            >
               ← Back
             </Button>
             <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
-              {vocabularyCategories.find((c) => c.id === selectedCategory)?.name}
+              {
+                vocabularyCategories.find((c) => c.id === selectedCategory)
+                  ?.name
+              }
             </h2>
             <Badge variant="primary">{filteredVocabulary.length} words</Badge>
           </div>
@@ -230,9 +258,19 @@ export default function Vocabulary() {
   );
 }
 
-function WordCard({ word, isLearned, isFavorite, onMarkLearned, onToggleFavorite, onClick }) {
+function WordCard({
+  word,
+  isLearned,
+  isFavorite,
+  onMarkLearned,
+  onToggleFavorite,
+  onClick,
+}) {
   return (
-    <Card className={`p-4 relative ${isLearned ? "ring-2 ring-green-500" : ""}`} onClick={onClick}>
+    <Card
+      className={`p-4 relative ${isLearned ? "ring-2 ring-green-500" : ""}`}
+      onClick={onClick}
+    >
       {/* Favorite button */}
       <button
         onClick={(e) => {
@@ -250,10 +288,14 @@ function WordCard({ word, isLearned, isFavorite, onMarkLearned, onToggleFavorite
       </h3>
 
       {/* Pronunciation */}
-      <p className="text-sm text-gray-400 italic mb-2">/{word.pronunciation}/</p>
+      <p className="text-sm text-gray-400 italic mb-2">
+        /{word.pronunciation}/
+      </p>
 
       {/* Vietnamese */}
-      <p className="text-lg text-blue-600 dark:text-blue-400 font-medium">{word.vietnamese}</p>
+      <p className="text-lg text-blue-600 dark:text-blue-400 font-medium">
+        {word.vietnamese}
+      </p>
 
       {/* Badges */}
       <div className="flex items-center gap-2 mt-3">
@@ -285,7 +327,13 @@ function WordCard({ word, isLearned, isFavorite, onMarkLearned, onToggleFavorite
   );
 }
 
-function WordDetail({ word, isLearned, isFavorite, onMarkLearned, onToggleFavorite }) {
+function WordDetail({
+  word,
+  isLearned,
+  isFavorite,
+  onMarkLearned,
+  onToggleFavorite,
+}) {
   const category = vocabularyCategories.find((c) => c.id === word.category);
 
   return (
@@ -293,11 +341,17 @@ function WordDetail({ word, isLearned, isFavorite, onMarkLearned, onToggleFavori
       {/* Main info */}
       <div className="text-center">
         <div className="flex items-center justify-center space-x-3 mb-2">
-          <h2 className="text-3xl font-bold text-gray-900 dark:text-white">{word.norwegian}</h2>
+          <h2 className="text-3xl font-bold text-gray-900 dark:text-white">
+            {word.norwegian}
+          </h2>
           <AudioButton size="lg" />
         </div>
-        <p className="text-lg text-gray-400 italic mb-3">/{word.pronunciation}/</p>
-        <p className="text-2xl text-blue-600 dark:text-blue-400 font-semibold">{word.vietnamese}</p>
+        <p className="text-lg text-gray-400 italic mb-3">
+          /{word.pronunciation}/
+        </p>
+        <p className="text-2xl text-blue-600 dark:text-blue-400 font-semibold">
+          {word.vietnamese}
+        </p>
       </div>
 
       {/* Badges */}
@@ -308,11 +362,17 @@ function WordDetail({ word, isLearned, isFavorite, onMarkLearned, onToggleFavori
 
       {/* Example sentences */}
       <div className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4">
-        <h4 className="font-semibold text-gray-900 dark:text-white mb-3">Example Sentences</h4>
+        <h4 className="font-semibold text-gray-900 dark:text-white mb-3">
+          Example Sentences
+        </h4>
         <div className="space-y-3">
           <div>
-            <p className="text-gray-900 dark:text-white font-medium">{word.exampleNo}</p>
-            <p className="text-gray-600 dark:text-gray-400 text-sm mt-1">{word.exampleVi}</p>
+            <p className="text-gray-900 dark:text-white font-medium">
+              {word.exampleNo}
+            </p>
+            <p className="text-gray-600 dark:text-gray-400 text-sm mt-1">
+              {word.exampleVi}
+            </p>
           </div>
         </div>
       </div>
@@ -346,7 +406,9 @@ function StudyMode({ words, onMarkLearned, progress }) {
   const [showAnswer, setShowAnswer] = useState(false);
 
   // Filter out already learned words
-  const unlearnedWords = words.filter((w) => !progress.wordsLearned.includes(w.id));
+  const unlearnedWords = words.filter(
+    (w) => !progress.wordsLearned.includes(w.id),
+  );
 
   if (unlearnedWords.length === 0) {
     return (
@@ -371,7 +433,9 @@ function StudyMode({ words, onMarkLearned, progress }) {
 
   const handlePrevious = () => {
     setShowAnswer(false);
-    setCurrentIndex((prev) => (prev - 1 + unlearnedWords.length) % unlearnedWords.length);
+    setCurrentIndex(
+      (prev) => (prev - 1 + unlearnedWords.length) % unlearnedWords.length,
+    );
   };
 
   const handleKnow = () => {
@@ -391,7 +455,9 @@ function StudyMode({ words, onMarkLearned, progress }) {
         <h3 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
           {currentWord.norwegian}
         </h3>
-        <p className="text-lg text-gray-400 italic mb-4">/{currentWord.pronunciation}/</p>
+        <p className="text-lg text-gray-400 italic mb-4">
+          /{currentWord.pronunciation}/
+        </p>
 
         {showAnswer ? (
           <>
@@ -399,7 +465,9 @@ function StudyMode({ words, onMarkLearned, progress }) {
               {currentWord.vietnamese}
             </p>
             <div className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4 mb-6">
-              <p className="text-gray-900 dark:text-white">{currentWord.exampleNo}</p>
+              <p className="text-gray-900 dark:text-white">
+                {currentWord.exampleNo}
+              </p>
               <p className="text-gray-600 dark:text-gray-400 text-sm mt-1">
                 {currentWord.exampleVi}
               </p>
@@ -414,7 +482,11 @@ function StudyMode({ words, onMarkLearned, progress }) {
             </div>
           </>
         ) : (
-          <Button variant="primary" size="lg" onClick={() => setShowAnswer(true)}>
+          <Button
+            variant="primary"
+            size="lg"
+            onClick={() => setShowAnswer(true)}
+          >
             Show Answer
           </Button>
         )}

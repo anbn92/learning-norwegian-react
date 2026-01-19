@@ -1,18 +1,27 @@
-import { useState } from 'react';
-import { grammarTopics } from '../data/grammar';
-import { useProgress } from '../context/ProgressContext';
-import { useToast } from '../context/ToastContext';
-import { Card, Button, Badge, DifficultyBadge, Modal, ProgressBar } from '../components/UI';
+import { useState } from "react";
+import { grammarTopics } from "../data/grammar";
+import { useProgress } from "../context/ProgressContext";
+import { useLanguage } from "../context/LanguageContext";
+import { useToast } from "../context/ToastContext";
+import {
+  Card,
+  Button,
+  Badge,
+  DifficultyBadge,
+  Modal,
+  ProgressBar,
+} from "../components/UI";
 
 export default function Grammar() {
   const [selectedTopic, setSelectedTopic] = useState(null);
 
   const { progress, markGrammarCompleted } = useProgress();
+  const { t } = useLanguage();
   const { success } = useToast();
 
   const handleMarkCompleted = (topicId) => {
     markGrammarCompleted(topicId);
-    success('Grammar lesson completed! +15 points');
+    success("Grammar lesson completed! +15 points");
   };
 
   const completedCount = progress.grammarCompleted.length;
@@ -23,10 +32,10 @@ export default function Grammar() {
       {/* Header */}
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-          Grammar / Ngữ pháp 📝
+          {t("grammar.title")} 📝
         </h1>
         <p className="text-gray-600 dark:text-gray-400">
-          Learn Norwegian grammar rules and patterns
+          {t("grammar.subtitle")}
         </p>
       </div>
 
@@ -35,8 +44,12 @@ export default function Grammar() {
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div className="flex items-center space-x-6">
             <div>
-              <p className="text-sm text-gray-500 dark:text-gray-400">Topics Completed</p>
-              <p className="text-xl font-bold text-gray-900 dark:text-white">{completedCount}/{totalTopics}</p>
+              <p className="text-sm text-gray-500 dark:text-gray-400">
+                Topics Completed
+              </p>
+              <p className="text-xl font-bold text-gray-900 dark:text-white">
+                {completedCount}/{totalTopics}
+              </p>
             </div>
             <div className="flex-1 max-w-xs">
               <ProgressBar
@@ -85,13 +98,15 @@ export default function Grammar() {
 function GrammarTopicCard({ topic, isCompleted, onClick }) {
   return (
     <Card
-      className={`p-4 cursor-pointer ${isCompleted ? 'ring-2 ring-green-500' : ''}`}
+      className={`p-4 cursor-pointer ${isCompleted ? "ring-2 ring-green-500" : ""}`}
       onClick={onClick}
     >
       <div className="flex items-start justify-between mb-3">
         <div className="text-3xl">{topic.icon}</div>
         {isCompleted && (
-          <Badge variant="success" icon="✓">Completed</Badge>
+          <Badge variant="success" icon="✓">
+            Completed
+          </Badge>
         )}
       </div>
 
@@ -119,11 +134,14 @@ function GrammarLesson({ topic, isCompleted, onMarkCompleted }) {
       {/* Navigation tabs */}
       <div className="flex flex-wrap gap-2 border-b border-gray-200 dark:border-gray-700 pb-3">
         <button
-          onClick={() => { setCurrentSection(-1); setShowExercises(false); }}
+          onClick={() => {
+            setCurrentSection(-1);
+            setShowExercises(false);
+          }}
           className={`px-3 py-1 rounded-lg text-sm font-medium transition-colors ${
             currentSection === -1 && !showExercises
-              ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/50 dark:text-blue-400'
-              : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800'
+              ? "bg-blue-100 text-blue-700 dark:bg-blue-900/50 dark:text-blue-400"
+              : "text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800"
           }`}
         >
           Introduction
@@ -131,11 +149,14 @@ function GrammarLesson({ topic, isCompleted, onMarkCompleted }) {
         {sections.map((section, index) => (
           <button
             key={index}
-            onClick={() => { setCurrentSection(index); setShowExercises(false); }}
+            onClick={() => {
+              setCurrentSection(index);
+              setShowExercises(false);
+            }}
             className={`px-3 py-1 rounded-lg text-sm font-medium transition-colors ${
               currentSection === index && !showExercises
-                ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/50 dark:text-blue-400'
-                : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800'
+                ? "bg-blue-100 text-blue-700 dark:bg-blue-900/50 dark:text-blue-400"
+                : "text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800"
             }`}
           >
             {section.title}
@@ -145,8 +166,8 @@ function GrammarLesson({ topic, isCompleted, onMarkCompleted }) {
           onClick={() => setShowExercises(true)}
           className={`px-3 py-1 rounded-lg text-sm font-medium transition-colors ${
             showExercises
-              ? 'bg-green-100 text-green-700 dark:bg-green-900/50 dark:text-green-400'
-              : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800'
+              ? "bg-green-100 text-green-700 dark:bg-green-900/50 dark:text-green-400"
+              : "text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800"
           }`}
         >
           Exercises
@@ -175,7 +196,10 @@ function GrammarLesson({ topic, isCompleted, onMarkCompleted }) {
               </h4>
               <ul className="list-disc list-inside space-y-1">
                 {content.tips.map((tip, index) => (
-                  <li key={index} className="text-yellow-700 dark:text-yellow-300 text-sm">
+                  <li
+                    key={index}
+                    className="text-yellow-700 dark:text-yellow-300 text-sm"
+                  >
                     {tip}
                   </li>
                 ))}
@@ -186,10 +210,15 @@ function GrammarLesson({ topic, isCompleted, onMarkCompleted }) {
           {/* Examples */}
           {content.examples && content.examples.length > 0 && (
             <div>
-              <h4 className="font-semibold text-gray-900 dark:text-white mb-3">Examples</h4>
+              <h4 className="font-semibold text-gray-900 dark:text-white mb-3">
+                Examples
+              </h4>
               <div className="space-y-2">
                 {content.examples.map((example, index) => (
-                  <div key={index} className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-3">
+                  <div
+                    key={index}
+                    className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-3"
+                  >
                     <p className="font-medium text-gray-900 dark:text-white">
                       {example.norwegian}
                     </p>
@@ -215,14 +244,16 @@ function GrammarLesson({ topic, isCompleted, onMarkCompleted }) {
               <table className="min-w-full border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
                 <thead className="bg-gray-50 dark:bg-gray-800">
                   <tr>
-                    {sections[currentSection].table.headers.map((header, index) => (
-                      <th
-                        key={index}
-                        className="px-4 py-2 text-left text-sm font-semibold text-gray-900 dark:text-white"
-                      >
-                        {header}
-                      </th>
-                    ))}
+                    {sections[currentSection].table.headers.map(
+                      (header, index) => (
+                        <th
+                          key={index}
+                          className="px-4 py-2 text-left text-sm font-semibold text-gray-900 dark:text-white"
+                        >
+                          {header}
+                        </th>
+                      ),
+                    )}
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
@@ -265,7 +296,9 @@ function GrammarLesson({ topic, isCompleted, onMarkCompleted }) {
             </Button>
           )}
           {isCompleted && (
-            <Badge variant="success" size="lg" icon="✓">Completed</Badge>
+            <Badge variant="success" size="lg" icon="✓">
+              Completed
+            </Badge>
           )}
           {currentSection < sections.length - 1 && !showExercises && (
             <Button
@@ -276,10 +309,7 @@ function GrammarLesson({ topic, isCompleted, onMarkCompleted }) {
             </Button>
           )}
           {currentSection === sections.length - 1 && !showExercises && (
-            <Button
-              variant="primary"
-              onClick={() => setShowExercises(true)}
-            >
+            <Button variant="primary" onClick={() => setShowExercises(true)}>
               Practice →
             </Button>
           )}
@@ -310,8 +340,9 @@ function GrammarExercises({ exercises, onComplete, isCompleted }) {
   };
 
   const exercise = exercises[currentExercise];
-  const userAnswer = userAnswers[currentExercise] || '';
-  const isCorrect = userAnswer.toLowerCase().trim() === exercise.answer.toLowerCase().trim();
+  const userAnswer = userAnswers[currentExercise] || "";
+  const isCorrect =
+    userAnswer.toLowerCase().trim() === exercise.answer.toLowerCase().trim();
 
   return (
     <div className="space-y-6">
@@ -343,18 +374,23 @@ function GrammarExercises({ exercises, onComplete, isCompleted }) {
         />
 
         {showResults && (
-          <div className={`mt-4 p-3 rounded-lg ${
-            isCorrect
-              ? 'bg-green-100 dark:bg-green-900/30'
-              : 'bg-red-100 dark:bg-red-900/30'
-          }`}>
+          <div
+            className={`mt-4 p-3 rounded-lg ${
+              isCorrect
+                ? "bg-green-100 dark:bg-green-900/30"
+                : "bg-red-100 dark:bg-red-900/30"
+            }`}
+          >
             {isCorrect ? (
               <p className="text-green-700 dark:text-green-400">✓ Correct!</p>
             ) : (
               <div>
-                <p className="text-red-700 dark:text-red-400">✕ Not quite right</p>
+                <p className="text-red-700 dark:text-red-400">
+                  ✕ Not quite right
+                </p>
                 <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-                  Correct answer: <span className="font-medium">{exercise.answer}</span>
+                  Correct answer:{" "}
+                  <span className="font-medium">{exercise.answer}</span>
                 </p>
               </div>
             )}

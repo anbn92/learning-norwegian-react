@@ -1,13 +1,21 @@
-import { useMemo } from 'react';
-import { useProgress } from '../context/ProgressContext';
-import { achievements, levels } from '../data/achievements';
-import { vocabulary } from '../data/vocabulary';
-import { phrases } from '../data/phrases';
-import { grammarTopics } from '../data/grammar';
-import { Card, Button, Badge, ProgressBar, CircularProgress } from '../components/UI';
+import { useMemo } from "react";
+import { useProgress } from "../context/ProgressContext";
+import { useLanguage } from "../context/LanguageContext";
+import { achievements, levels } from "../data/achievements";
+import { vocabulary } from "../data/vocabulary";
+import { phrases } from "../data/phrases";
+import { grammarTopics } from "../data/grammar";
+import {
+  Card,
+  Button,
+  Badge,
+  ProgressBar,
+  CircularProgress,
+} from "../components/UI";
 
 export default function Progress() {
   const { progress, level, levelProgress, resetProgress } = useProgress();
+  const { t } = useLanguage();
 
   // Calculate various stats
   const stats = useMemo(() => {
@@ -19,19 +27,27 @@ export default function Progress() {
     const grammarCompleted = progress.grammarCompleted.length;
 
     // Calculate average quiz score
-    const averageQuizScore = progress.quizScores.length > 0
-      ? Math.round(progress.quizScores.reduce((acc, q) => acc + q.percentage, 0) / progress.quizScores.length)
-      : 0;
+    const averageQuizScore =
+      progress.quizScores.length > 0
+        ? Math.round(
+            progress.quizScores.reduce((acc, q) => acc + q.percentage, 0) /
+              progress.quizScores.length,
+          )
+        : 0;
 
     // Calculate recent quiz trend
     const recentQuizzes = progress.quizScores.slice(-5);
     const olderQuizzes = progress.quizScores.slice(-10, -5);
-    let quizTrend = 'neutral';
+    let quizTrend = "neutral";
     if (recentQuizzes.length >= 3 && olderQuizzes.length >= 3) {
-      const recentAvg = recentQuizzes.reduce((acc, q) => acc + q.percentage, 0) / recentQuizzes.length;
-      const olderAvg = olderQuizzes.reduce((acc, q) => acc + q.percentage, 0) / olderQuizzes.length;
-      if (recentAvg > olderAvg + 5) quizTrend = 'up';
-      else if (recentAvg < olderAvg - 5) quizTrend = 'down';
+      const recentAvg =
+        recentQuizzes.reduce((acc, q) => acc + q.percentage, 0) /
+        recentQuizzes.length;
+      const olderAvg =
+        olderQuizzes.reduce((acc, q) => acc + q.percentage, 0) /
+        olderQuizzes.length;
+      if (recentAvg > olderAvg + 5) quizTrend = "up";
+      else if (recentAvg < olderAvg - 5) quizTrend = "down";
     }
 
     return {
@@ -74,11 +90,11 @@ export default function Progress() {
   const streakCalendar = getStreakCalendar();
 
   // Get unlocked and locked achievements
-  const unlockedAchievements = achievements.filter(a =>
-    progress.achievementsUnlocked.includes(a.id)
+  const unlockedAchievements = achievements.filter((a) =>
+    progress.achievementsUnlocked.includes(a.id),
   );
-  const lockedAchievements = achievements.filter(a =>
-    !progress.achievementsUnlocked.includes(a.id)
+  const lockedAchievements = achievements.filter(
+    (a) => !progress.achievementsUnlocked.includes(a.id),
   );
 
   return (
@@ -86,10 +102,10 @@ export default function Progress() {
       {/* Header */}
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-          Progress / Tiến độ 📊
+          {t("progress.title")} 📊
         </h1>
         <p className="text-gray-600 dark:text-gray-400">
-          Track your Norwegian learning journey
+          {t("progress.subtitle")}
         </p>
       </div>
 
@@ -98,9 +114,11 @@ export default function Progress() {
         {/* Level Card */}
         <Card className="p-6 md:col-span-2">
           <div className="flex items-center gap-6">
-            <div className={`w-24 h-24 rounded-2xl ${level.color} flex flex-col items-center justify-center text-white`}>
+            <div
+              className={`w-24 h-24 rounded-2xl ${level.color} flex flex-col items-center justify-center text-white`}
+            >
               <span className="text-3xl font-bold">{level.level}</span>
-              <span className="text-xs opacity-80">Level</span>
+              <span className="text-xs opacity-80">{t("nav.level")}</span>
             </div>
             <div className="flex-1">
               <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-1">
@@ -117,7 +135,8 @@ export default function Progress() {
               />
               {levelProgress.nextLevel && (
                 <p className="text-xs text-gray-400 mt-2">
-                  {levelProgress.pointsNeeded} points to {levelProgress.nextLevel.title}
+                  {levelProgress.pointsNeeded} points to{" "}
+                  {levelProgress.nextLevel.title}
                 </p>
               )}
             </div>
@@ -128,10 +147,16 @@ export default function Progress() {
         <Card className="p-6">
           <div className="text-center">
             <div className="text-5xl mb-2">🔥</div>
-            <p className="text-4xl font-bold text-orange-500">{progress.streak}</p>
-            <p className="text-sm text-gray-500 dark:text-gray-400">Day Streak</p>
+            <p className="text-4xl font-bold text-orange-500">
+              {progress.streak}
+            </p>
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+              {t("progress.currentStreak")}
+            </p>
             {progress.streak >= 7 && (
-              <Badge variant="warning" className="mt-2">On fire!</Badge>
+              <Badge variant="warning" className="mt-2">
+                On fire!
+              </Badge>
             )}
           </div>
         </Card>
@@ -144,7 +169,8 @@ export default function Progress() {
               {stats.unlockedAchievements}
             </p>
             <p className="text-sm text-gray-500 dark:text-gray-400">
-              of {stats.totalAchievements} Achievements
+              {t("dashboard.of")} {stats.totalAchievements}{" "}
+              {t("progress.achievements")}
             </p>
           </div>
         </Card>
@@ -155,8 +181,14 @@ export default function Progress() {
         {/* Vocabulary Progress */}
         <Card className="p-6">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="font-semibold text-gray-900 dark:text-white">Vocabulary</h3>
-            <CircularProgress value={stats.wordsLearned} max={stats.totalWords} color="blue" />
+            <h3 className="font-semibold text-gray-900 dark:text-white">
+              Vocabulary
+            </h3>
+            <CircularProgress
+              value={stats.wordsLearned}
+              max={stats.totalWords}
+              color="blue"
+            />
           </div>
           <div className="space-y-2">
             <div className="flex justify-between text-sm">
@@ -177,8 +209,14 @@ export default function Progress() {
         {/* Phrases Progress */}
         <Card className="p-6">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="font-semibold text-gray-900 dark:text-white">Phrases</h3>
-            <CircularProgress value={stats.phrasesLearned} max={stats.totalPhrases} color="purple" />
+            <h3 className="font-semibold text-gray-900 dark:text-white">
+              Phrases
+            </h3>
+            <CircularProgress
+              value={stats.phrasesLearned}
+              max={stats.totalPhrases}
+              color="purple"
+            />
           </div>
           <div className="space-y-2">
             <div className="flex justify-between text-sm">
@@ -193,8 +231,14 @@ export default function Progress() {
         {/* Grammar Progress */}
         <Card className="p-6">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="font-semibold text-gray-900 dark:text-white">Grammar</h3>
-            <CircularProgress value={stats.grammarCompleted} max={stats.totalGrammar} color="green" />
+            <h3 className="font-semibold text-gray-900 dark:text-white">
+              Grammar
+            </h3>
+            <CircularProgress
+              value={stats.grammarCompleted}
+              max={stats.totalGrammar}
+              color="green"
+            />
           </div>
           <div className="space-y-2">
             <div className="flex justify-between text-sm">
@@ -211,23 +255,33 @@ export default function Progress() {
       <div className="grid lg:grid-cols-2 gap-6 mb-8">
         {/* Quiz Statistics */}
         <Card className="p-6">
-          <h3 className="font-semibold text-gray-900 dark:text-white mb-4">Quiz Statistics</h3>
+          <h3 className="font-semibold text-gray-900 dark:text-white mb-4">
+            Quiz Statistics
+          </h3>
 
           <div className="grid grid-cols-2 gap-4 mb-6">
             <div className="text-center p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
-              <p className="text-3xl font-bold text-blue-600">{progress.quizzesCompleted}</p>
+              <p className="text-3xl font-bold text-blue-600">
+                {progress.quizzesCompleted}
+              </p>
               <p className="text-sm text-gray-500">Quizzes Completed</p>
             </div>
             <div className="text-center p-4 bg-green-50 dark:bg-green-900/20 rounded-lg">
-              <p className="text-3xl font-bold text-green-600">{stats.averageQuizScore}%</p>
+              <p className="text-3xl font-bold text-green-600">
+                {stats.averageQuizScore}%
+              </p>
               <p className="text-sm text-gray-500">Average Score</p>
             </div>
             <div className="text-center p-4 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg">
-              <p className="text-3xl font-bold text-yellow-600">{progress.perfectQuizzes}</p>
+              <p className="text-3xl font-bold text-yellow-600">
+                {progress.perfectQuizzes}
+              </p>
               <p className="text-sm text-gray-500">Perfect Scores</p>
             </div>
             <div className="text-center p-4 bg-purple-50 dark:bg-purple-900/20 rounded-lg">
-              <p className="text-3xl font-bold text-purple-600">{progress.flashcardsReviewed}</p>
+              <p className="text-3xl font-bold text-purple-600">
+                {progress.flashcardsReviewed}
+              </p>
               <p className="text-sm text-gray-500">Flashcards Reviewed</p>
             </div>
           </div>
@@ -235,18 +289,34 @@ export default function Progress() {
           {/* Recent quizzes */}
           {progress.quizScores.length > 0 && (
             <div>
-              <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Recent Quizzes</h4>
+              <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                Recent Quizzes
+              </h4>
               <div className="space-y-2">
-                {progress.quizScores.slice(-5).reverse().map((quiz, index) => (
-                  <div key={index} className="flex items-center justify-between p-2 bg-gray-50 dark:bg-gray-700/50 rounded">
-                    <span className="text-sm text-gray-600 dark:text-gray-400">
-                      {new Date(quiz.date).toLocaleDateString()}
-                    </span>
-                    <Badge variant={quiz.percentage >= 80 ? 'success' : quiz.percentage >= 60 ? 'warning' : 'danger'}>
-                      {quiz.percentage}%
-                    </Badge>
-                  </div>
-                ))}
+                {progress.quizScores
+                  .slice(-5)
+                  .reverse()
+                  .map((quiz, index) => (
+                    <div
+                      key={index}
+                      className="flex items-center justify-between p-2 bg-gray-50 dark:bg-gray-700/50 rounded"
+                    >
+                      <span className="text-sm text-gray-600 dark:text-gray-400">
+                        {new Date(quiz.date).toLocaleDateString()}
+                      </span>
+                      <Badge
+                        variant={
+                          quiz.percentage >= 80
+                            ? "success"
+                            : quiz.percentage >= 60
+                              ? "warning"
+                              : "danger"
+                        }
+                      >
+                        {quiz.percentage}%
+                      </Badge>
+                    </div>
+                  ))}
               </div>
             </div>
           )}
@@ -254,12 +324,16 @@ export default function Progress() {
 
         {/* Study Calendar */}
         <Card className="p-6">
-          <h3 className="font-semibold text-gray-900 dark:text-white mb-4">Study Calendar</h3>
+          <h3 className="font-semibold text-gray-900 dark:text-white mb-4">
+            Study Calendar
+          </h3>
 
           <div className="mb-4">
             <div className="grid grid-cols-7 gap-1 mb-1 text-center">
-              {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((day, i) => (
-                <span key={i} className="text-xs text-gray-400">{day}</span>
+              {["S", "M", "T", "W", "T", "F", "S"].map((day, i) => (
+                <span key={i} className="text-xs text-gray-400">
+                  {day}
+                </span>
               ))}
             </div>
             <div className="space-y-1">
@@ -270,10 +344,10 @@ export default function Progress() {
                       key={dayIndex}
                       className={`aspect-square rounded flex items-center justify-center text-xs font-medium ${
                         day.studied
-                          ? 'bg-green-500 text-white'
+                          ? "bg-green-500 text-white"
                           : day.isToday
-                          ? 'bg-blue-100 dark:bg-blue-900/50 text-blue-600 dark:text-blue-400 ring-2 ring-blue-500'
-                          : 'bg-gray-100 dark:bg-gray-700 text-gray-400'
+                            ? "bg-blue-100 dark:bg-blue-900/50 text-blue-600 dark:text-blue-400 ring-2 ring-blue-500"
+                            : "bg-gray-100 dark:bg-gray-700 text-gray-400"
                       }`}
                     >
                       {day.date}
@@ -307,13 +381,20 @@ export default function Progress() {
             </h3>
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
               {unlockedAchievements.map((achievement) => (
-                <Card key={achievement.id} className="p-4 text-center bg-gradient-to-br from-yellow-50 to-orange-50 dark:from-yellow-900/20 dark:to-orange-900/20">
+                <Card
+                  key={achievement.id}
+                  className="p-4 text-center bg-gradient-to-br from-yellow-50 to-orange-50 dark:from-yellow-900/20 dark:to-orange-900/20"
+                >
                   <div className="text-4xl mb-2">{achievement.icon}</div>
                   <h4 className="font-medium text-gray-900 dark:text-white text-sm">
                     {achievement.title}
                   </h4>
-                  <p className="text-xs text-gray-500 mt-1">{achievement.titleVi}</p>
-                  <Badge variant="warning" className="mt-2">+{achievement.points}</Badge>
+                  <p className="text-xs text-gray-500 mt-1">
+                    {achievement.titleVi}
+                  </p>
+                  <Badge variant="warning" className="mt-2">
+                    +{achievement.points}
+                  </Badge>
                 </Card>
               ))}
             </div>
@@ -328,12 +409,17 @@ export default function Progress() {
             </h3>
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
               {lockedAchievements.slice(0, 12).map((achievement) => (
-                <Card key={achievement.id} className="p-4 text-center opacity-60">
+                <Card
+                  key={achievement.id}
+                  className="p-4 text-center opacity-60"
+                >
                   <div className="text-4xl mb-2 grayscale">🔒</div>
                   <h4 className="font-medium text-gray-900 dark:text-white text-sm">
                     {achievement.title}
                   </h4>
-                  <p className="text-xs text-gray-400 mt-1">{achievement.description}</p>
+                  <p className="text-xs text-gray-400 mt-1">
+                    {achievement.description}
+                  </p>
                 </Card>
               ))}
             </div>
@@ -352,22 +438,24 @@ export default function Progress() {
               key={lvl.level}
               className={`p-4 text-center ${
                 lvl.level <= level.level
-                  ? 'ring-2 ring-green-500'
-                  : 'opacity-60'
+                  ? "ring-2 ring-green-500"
+                  : "opacity-60"
               }`}
             >
-              <div className={`w-12 h-12 rounded-full ${lvl.color} mx-auto mb-2 flex items-center justify-center text-white font-bold`}>
+              <div
+                className={`w-12 h-12 rounded-full ${lvl.color} mx-auto mb-2 flex items-center justify-center text-white font-bold`}
+              >
                 {lvl.level}
               </div>
               <h4 className="font-medium text-gray-900 dark:text-white text-sm">
                 {lvl.title}
               </h4>
               <p className="text-xs text-gray-500">{lvl.titleVi}</p>
-              <p className="text-xs text-gray-400 mt-1">
-                {lvl.minPoints}+ pts
-              </p>
+              <p className="text-xs text-gray-400 mt-1">{lvl.minPoints}+ pts</p>
               {lvl.level <= level.level && (
-                <Badge variant="success" className="mt-2" icon="✓">Reached</Badge>
+                <Badge variant="success" className="mt-2" icon="✓">
+                  Reached
+                </Badge>
               )}
             </Card>
           ))}
@@ -383,7 +471,11 @@ export default function Progress() {
         <Button
           variant="danger"
           onClick={() => {
-            if (confirm('Are you sure you want to reset all progress? This cannot be undone!')) {
+            if (
+              confirm(
+                "Are you sure you want to reset all progress? This cannot be undone!",
+              )
+            ) {
               resetProgress();
             }
           }}
