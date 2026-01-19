@@ -1,24 +1,36 @@
-import { useState, useMemo } from 'react';
-import { phrases, phraseCategories, dialogues } from '../data/phrases';
-import { useProgress } from '../context/ProgressContext';
-import { useToast } from '../context/ToastContext';
-import { Card, Button, Badge, FormalityBadge, SearchBar, Modal, AudioButton } from '../components/UI';
+import { useState, useMemo } from "react";
+import { phrases, phraseCategories, dialogues } from "../data/phrases";
+import { useProgress } from "../context/ProgressContext";
+import { useLanguage } from "../context/LanguageContext";
+import { useToast } from "../context/ToastContext";
+import {
+  Card,
+  Button,
+  Badge,
+  FormalityBadge,
+  SearchBar,
+  Modal,
+  AudioButton,
+} from "../components/UI";
 
 export default function Phrases() {
   const [selectedCategory, setSelectedCategory] = useState(null);
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState("");
   const [selectedPhrase, setSelectedPhrase] = useState(null);
   const [showDialogues, setShowDialogues] = useState(false);
   const [selectedDialogue, setSelectedDialogue] = useState(null);
 
   const { progress, markPhraseLearned } = useProgress();
+  const { t } = useLanguage();
   const { success } = useToast();
 
   // Filter phrases
   const filteredPhrases = useMemo(() => {
-    return phrases.filter(phrase => {
-      const matchesCategory = !selectedCategory || phrase.category === selectedCategory;
-      const matchesSearch = !searchQuery ||
+    return phrases.filter((phrase) => {
+      const matchesCategory =
+        !selectedCategory || phrase.category === selectedCategory;
+      const matchesSearch =
+        !searchQuery ||
         phrase.norwegian.toLowerCase().includes(searchQuery.toLowerCase()) ||
         phrase.vietnamese.toLowerCase().includes(searchQuery.toLowerCase());
 
@@ -29,21 +41,22 @@ export default function Phrases() {
   // Filter dialogues
   const filteredDialogues = useMemo(() => {
     if (!selectedCategory) return dialogues;
-    return dialogues.filter(d => d.category === selectedCategory);
+    return dialogues.filter((d) => d.category === selectedCategory);
   }, [selectedCategory]);
 
   const handleMarkLearned = (phraseId) => {
     markPhraseLearned(phraseId);
-    success('Phrase marked as learned! +5 points');
+    success("Phrase marked as learned! +5 points");
   };
 
   const getCategoryCount = (categoryId) => {
-    return phrases.filter(p => p.category === categoryId).length;
+    return phrases.filter((p) => p.category === categoryId).length;
   };
 
   const getLearnedCount = (categoryId) => {
-    return phrases.filter(p =>
-      p.category === categoryId && progress.phrasesLearned.includes(p.id)
+    return phrases.filter(
+      (p) =>
+        p.category === categoryId && progress.phrasesLearned.includes(p.id),
     ).length;
   };
 
@@ -52,10 +65,10 @@ export default function Phrases() {
       {/* Header */}
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-          Phrases / Cụm từ 💬
+          {t("phrases.title")} 💬
         </h1>
         <p className="text-gray-600 dark:text-gray-400">
-          Learn common Norwegian phrases and expressions
+          {t("phrases.subtitle")}
         </p>
       </div>
 
@@ -64,28 +77,40 @@ export default function Phrases() {
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div className="flex items-center space-x-6">
             <div>
-              <p className="text-sm text-gray-500 dark:text-gray-400">Total Phrases</p>
-              <p className="text-xl font-bold text-gray-900 dark:text-white">{phrases.length}</p>
+              <p className="text-sm text-gray-500 dark:text-gray-400">
+                {t("phrases.totalPhrases")}
+              </p>
+              <p className="text-xl font-bold text-gray-900 dark:text-white">
+                {phrases.length}
+              </p>
             </div>
             <div>
-              <p className="text-sm text-gray-500 dark:text-gray-400">Learned</p>
-              <p className="text-xl font-bold text-green-600">{progress.phrasesLearned.length}</p>
+              <p className="text-sm text-gray-500 dark:text-gray-400">
+                {t("phrases.learned")}
+              </p>
+              <p className="text-xl font-bold text-green-600">
+                {progress.phrasesLearned.length}
+              </p>
             </div>
             <div>
-              <p className="text-sm text-gray-500 dark:text-gray-400">Dialogues</p>
-              <p className="text-xl font-bold text-purple-600">{dialogues.length}</p>
+              <p className="text-sm text-gray-500 dark:text-gray-400">
+                {t("phrases.dialogues")}
+              </p>
+              <p className="text-xl font-bold text-purple-600">
+                {dialogues.length}
+              </p>
             </div>
           </div>
           <div className="flex items-center space-x-2">
             <Button
-              variant={!showDialogues ? 'primary' : 'outline'}
+              variant={!showDialogues ? "primary" : "outline"}
               size="sm"
               onClick={() => setShowDialogues(false)}
             >
               Phrases
             </Button>
             <Button
-              variant={showDialogues ? 'primary' : 'outline'}
+              variant={showDialogues ? "primary" : "outline"}
               size="sm"
               onClick={() => setShowDialogues(true)}
             >
@@ -117,15 +142,20 @@ export default function Phrases() {
                 className="p-4 cursor-pointer hover:scale-105 transition-transform"
                 onClick={() => setSelectedCategory(category.id)}
               >
-                <div className={`w-12 h-12 rounded-xl ${category.color} flex items-center justify-center text-2xl mb-2`}>
+                <div
+                  className={`w-12 h-12 rounded-xl ${category.color} flex items-center justify-center text-2xl mb-2`}
+                >
                   {category.icon}
                 </div>
                 <h3 className="font-medium text-gray-900 dark:text-white text-sm">
                   {category.name}
                 </h3>
-                <p className="text-xs text-gray-500 dark:text-gray-400">{category.nameVi}</p>
+                <p className="text-xs text-gray-500 dark:text-gray-400">
+                  {category.nameVi}
+                </p>
                 <p className="text-xs text-gray-400 mt-1">
-                  {getLearnedCount(category.id)}/{getCategoryCount(category.id)} learned
+                  {getLearnedCount(category.id)}/{getCategoryCount(category.id)}{" "}
+                  learned
                 </p>
               </Card>
             ))}
@@ -145,10 +175,12 @@ export default function Phrases() {
               ← Back
             </Button>
             <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
-              {phraseCategories.find(c => c.id === selectedCategory)?.name}
+              {phraseCategories.find((c) => c.id === selectedCategory)?.name}
             </h2>
             <Badge variant="primary">
-              {showDialogues ? filteredDialogues.length + ' dialogues' : filteredPhrases.length + ' phrases'}
+              {showDialogues
+                ? filteredDialogues.length + " dialogues"
+                : filteredPhrases.length + " phrases"}
             </Badge>
           </div>
         </div>
@@ -182,7 +214,8 @@ export default function Phrases() {
       )}
 
       {/* Empty state */}
-      {((!showDialogues && filteredPhrases.length === 0) || (showDialogues && filteredDialogues.length === 0)) && (
+      {((!showDialogues && filteredPhrases.length === 0) ||
+        (showDialogues && filteredDialogues.length === 0)) && (
         <div className="text-center py-12">
           <p className="text-gray-500 dark:text-gray-400 text-lg">
             No results found.
@@ -191,7 +224,7 @@ export default function Phrases() {
             variant="outline"
             className="mt-4"
             onClick={() => {
-              setSearchQuery('');
+              setSearchQuery("");
               setSelectedCategory(null);
             }}
           >
@@ -223,9 +256,7 @@ export default function Phrases() {
         title={selectedDialogue?.title}
         size="xl"
       >
-        {selectedDialogue && (
-          <DialogueDetail dialogue={selectedDialogue} />
-        )}
+        {selectedDialogue && <DialogueDetail dialogue={selectedDialogue} />}
       </Modal>
     </div>
   );
@@ -234,7 +265,7 @@ export default function Phrases() {
 function PhraseCard({ phrase, isLearned, onMarkLearned, onClick }) {
   return (
     <Card
-      className={`p-4 ${isLearned ? 'ring-2 ring-green-500' : ''}`}
+      className={`p-4 ${isLearned ? "ring-2 ring-green-500" : ""}`}
       onClick={onClick}
     >
       {/* Norwegian phrase */}
@@ -256,7 +287,9 @@ function PhraseCard({ phrase, isLearned, onMarkLearned, onClick }) {
       <div className="flex items-center gap-2 mb-3">
         <FormalityBadge formality={phrase.formality} />
         {isLearned && (
-          <Badge variant="success" icon="✓">Learned</Badge>
+          <Badge variant="success" icon="✓">
+            Learned
+          </Badge>
         )}
       </div>
 
@@ -281,7 +314,7 @@ function PhraseCard({ phrase, isLearned, onMarkLearned, onClick }) {
 }
 
 function PhraseDetail({ phrase, isLearned, onMarkLearned }) {
-  const category = phraseCategories.find(c => c.id === phrase.category);
+  const category = phraseCategories.find((c) => c.id === phrase.category);
 
   return (
     <div className="space-y-6">
@@ -306,7 +339,9 @@ function PhraseDetail({ phrase, isLearned, onMarkLearned }) {
 
       {/* Context */}
       <div className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4">
-        <h4 className="font-semibold text-gray-900 dark:text-white mb-2">Context</h4>
+        <h4 className="font-semibold text-gray-900 dark:text-white mb-2">
+          Context
+        </h4>
         <p className="text-gray-600 dark:text-gray-400">{phrase.context}</p>
       </div>
 
@@ -329,7 +364,9 @@ function PhraseDetail({ phrase, isLearned, onMarkLearned }) {
             Mark as Learned
           </Button>
         ) : (
-          <Badge variant="success" size="lg" icon="✓">Already Learned</Badge>
+          <Badge variant="success" size="lg" icon="✓">
+            Already Learned
+          </Badge>
         )}
       </div>
     </div>
@@ -337,7 +374,7 @@ function PhraseDetail({ phrase, isLearned, onMarkLearned }) {
 }
 
 function DialogueCard({ dialogue, onClick }) {
-  const category = phraseCategories.find(c => c.id === dialogue.category);
+  const category = phraseCategories.find((c) => c.id === dialogue.category);
 
   return (
     <Card className="p-5 cursor-pointer" onClick={onClick}>
@@ -346,7 +383,9 @@ function DialogueCard({ dialogue, onClick }) {
           <h3 className="font-semibold text-gray-900 dark:text-white">
             {dialogue.title}
           </h3>
-          <p className="text-sm text-gray-500 dark:text-gray-400">{dialogue.titleVi}</p>
+          <p className="text-sm text-gray-500 dark:text-gray-400">
+            {dialogue.titleVi}
+          </p>
         </div>
         <Badge variant="info">{category?.name}</Badge>
       </div>
@@ -380,14 +419,14 @@ function DialogueDetail({ dialogue }) {
           <div
             key={index}
             className={`flex ${
-              index % 2 === 0 ? 'justify-start' : 'justify-end'
+              index % 2 === 0 ? "justify-start" : "justify-end"
             }`}
           >
             <div
               className={`max-w-[80%] rounded-2xl p-4 ${
                 index % 2 === 0
-                  ? 'bg-gray-100 dark:bg-gray-700 rounded-tl-none'
-                  : 'bg-blue-100 dark:bg-blue-900/50 rounded-tr-none'
+                  ? "bg-gray-100 dark:bg-gray-700 rounded-tl-none"
+                  : "bg-blue-100 dark:bg-blue-900/50 rounded-tr-none"
               }`}
             >
               <p className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">

@@ -1,86 +1,164 @@
-import { useState, useMemo, useCallback } from 'react';
-import { vocabulary, vocabularyCategories } from '../data/vocabulary';
-import { useProgress } from '../context/ProgressContext';
-import { useToast } from '../context/ToastContext';
-import { Card, Button, Badge, ProgressBar, Modal } from '../components/UI';
+import { useState, useMemo, useCallback } from "react";
+import { vocabulary, vocabularyCategories } from "../data/vocabulary";
+import { useProgress } from "../context/ProgressContext";
+import { useLanguage } from "../context/LanguageContext";
+import { useToast } from "../context/ToastContext";
+import { Card, Button, Badge, ProgressBar, Modal } from "../components/UI";
 
 // Predefined decks
 const predefinedDecks = [
-  { id: 'basic', name: 'Basic Words', nameVi: 'Từ cơ bản', icon: '🌱', description: 'Essential beginner vocabulary', filter: (w) => w.difficulty === 'beginner' },
-  { id: 'greetings', name: 'Greetings', nameVi: 'Chào hỏi', icon: '👋', description: 'Hello, goodbye, and more', filter: (w) => w.category === 'greetings' },
-  { id: 'numbers', name: 'Numbers', nameVi: 'Số đếm', icon: '🔢', description: 'Count from 1 to 1000', filter: (w) => w.category === 'numbers' },
-  { id: 'food', name: 'Food & Drinks', nameVi: 'Đồ ăn', icon: '🍽️', description: 'Culinary vocabulary', filter: (w) => w.category === 'food' },
-  { id: 'travel', name: 'Travel', nameVi: 'Du lịch', icon: '✈️', description: 'For your Norwegian trip', filter: (w) => w.category === 'travel' },
-  { id: 'family', name: 'Family', nameVi: 'Gia đình', icon: '👨‍👩‍👧‍👦', description: 'Family members', filter: (w) => w.category === 'family' },
-  { id: 'daily', name: 'Daily Life', nameVi: 'Hàng ngày', icon: '🏠', description: 'Everyday objects and activities', filter: (w) => w.category === 'daily' },
-  { id: 'favorites', name: 'Favorites', nameVi: 'Yêu thích', icon: '❤️', description: 'Your favorite words', filter: null, special: 'favorites' },
-  { id: 'review', name: 'Need Review', nameVi: 'Cần ôn tập', icon: '🔄', description: 'Words you need to practice', filter: null, special: 'review' },
+  {
+    id: "basic",
+    name: "Basic Words",
+    nameVi: "Từ cơ bản",
+    icon: "🌱",
+    description: "Essential beginner vocabulary",
+    filter: (w) => w.difficulty === "beginner",
+  },
+  {
+    id: "greetings",
+    name: "Greetings",
+    nameVi: "Chào hỏi",
+    icon: "👋",
+    description: "Hello, goodbye, and more",
+    filter: (w) => w.category === "greetings",
+  },
+  {
+    id: "numbers",
+    name: "Numbers",
+    nameVi: "Số đếm",
+    icon: "🔢",
+    description: "Count from 1 to 1000",
+    filter: (w) => w.category === "numbers",
+  },
+  {
+    id: "food",
+    name: "Food & Drinks",
+    nameVi: "Đồ ăn",
+    icon: "🍽️",
+    description: "Culinary vocabulary",
+    filter: (w) => w.category === "food",
+  },
+  {
+    id: "travel",
+    name: "Travel",
+    nameVi: "Du lịch",
+    icon: "✈️",
+    description: "For your Norwegian trip",
+    filter: (w) => w.category === "travel",
+  },
+  {
+    id: "family",
+    name: "Family",
+    nameVi: "Gia đình",
+    icon: "👨‍👩‍👧‍👦",
+    description: "Family members",
+    filter: (w) => w.category === "family",
+  },
+  {
+    id: "daily",
+    name: "Daily Life",
+    nameVi: "Hàng ngày",
+    icon: "🏠",
+    description: "Everyday objects and activities",
+    filter: (w) => w.category === "daily",
+  },
+  {
+    id: "favorites",
+    name: "Favorites",
+    nameVi: "Yêu thích",
+    icon: "❤️",
+    description: "Your favorite words",
+    filter: null,
+    special: "favorites",
+  },
+  {
+    id: "review",
+    name: "Need Review",
+    nameVi: "Cần ôn tập",
+    icon: "🔄",
+    description: "Words you need to practice",
+    filter: null,
+    special: "review",
+  },
 ];
 
 export default function Flashcards() {
   const [selectedDeck, setSelectedDeck] = useState(null);
   const [showCreateDeck, setShowCreateDeck] = useState(false);
 
-  const { progress, recordFlashcardReview, createCustomDeck, deleteCustomDeck } = useProgress();
+  const {
+    progress,
+    recordFlashcardReview,
+    createCustomDeck,
+    deleteCustomDeck,
+  } = useProgress();
+  const { t } = useLanguage();
   const { success, error } = useToast();
 
   // Get cards for a deck
-  const getDeckCards = useCallback((deck) => {
-    if (deck.special === 'favorites') {
-      return vocabulary.filter(w => progress.wordsFavorited.includes(w.id));
-    }
-    if (deck.special === 'review') {
-      // Words marked as "don't know" more often
-      const deckProgress = progress.flashcardDecks || {};
-      const reviewWords = [];
-      Object.entries(deckProgress).forEach(([, data]) => {
-        if (data.unknown && data.unknown.length > 0) {
-          data.unknown.forEach(id => {
-            if (!reviewWords.includes(id)) {
-              reviewWords.push(id);
-            }
-          });
-        }
-      });
-      return vocabulary.filter(w => reviewWords.includes(w.id));
-    }
-    if (deck.filter) {
-      return vocabulary.filter(deck.filter);
-    }
-    if (deck.wordIds) {
-      return vocabulary.filter(w => deck.wordIds.includes(w.id));
-    }
-    return [];
-  }, [progress.wordsFavorited, progress.flashcardDecks]);
+  const getDeckCards = useCallback(
+    (deck) => {
+      if (deck.special === "favorites") {
+        return vocabulary.filter((w) => progress.wordsFavorited.includes(w.id));
+      }
+      if (deck.special === "review") {
+        // Words marked as "don't know" more often
+        const deckProgress = progress.flashcardDecks || {};
+        const reviewWords = [];
+        Object.entries(deckProgress).forEach(([, data]) => {
+          if (data.unknown && data.unknown.length > 0) {
+            data.unknown.forEach((id) => {
+              if (!reviewWords.includes(id)) {
+                reviewWords.push(id);
+              }
+            });
+          }
+        });
+        return vocabulary.filter((w) => reviewWords.includes(w.id));
+      }
+      if (deck.filter) {
+        return vocabulary.filter(deck.filter);
+      }
+      if (deck.wordIds) {
+        return vocabulary.filter((w) => deck.wordIds.includes(w.id));
+      }
+      return [];
+    },
+    [progress.wordsFavorited, progress.flashcardDecks],
+  );
 
   const handleCreateDeck = (newDeck) => {
     createCustomDeck(newDeck);
-    success('Custom deck created!');
+    success("Custom deck created!");
     setShowCreateDeck(false);
   };
 
   const handleDeleteDeck = (deckId) => {
     deleteCustomDeck(deckId);
-    success('Deck deleted');
+    success("Deck deleted");
   };
 
   // Combine predefined and custom decks
-  const allDecks = [...predefinedDecks, ...progress.customDecks.map(d => ({
-    ...d,
-    custom: true,
-    filter: null,
-    wordIds: d.wordIds,
-  }))];
+  const allDecks = [
+    ...predefinedDecks,
+    ...progress.customDecks.map((d) => ({
+      ...d,
+      custom: true,
+      filter: null,
+      wordIds: d.wordIds,
+    })),
+  ];
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       {/* Header */}
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-          Flashcards / Thẻ học 🃏
+          {t("flashcards.title")} 🃏
         </h1>
         <p className="text-gray-600 dark:text-gray-400">
-          Practice vocabulary with interactive flashcards
+          {t("flashcards.subtitle")}
         </p>
       </div>
 
@@ -89,12 +167,20 @@ export default function Flashcards() {
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div className="flex items-center space-x-6">
             <div>
-              <p className="text-sm text-gray-500 dark:text-gray-400">Cards Reviewed</p>
-              <p className="text-xl font-bold text-gray-900 dark:text-white">{progress.flashcardsReviewed}</p>
+              <p className="text-sm text-gray-500 dark:text-gray-400">
+                Cards Reviewed
+              </p>
+              <p className="text-xl font-bold text-gray-900 dark:text-white">
+                {progress.flashcardsReviewed}
+              </p>
             </div>
             <div>
-              <p className="text-sm text-gray-500 dark:text-gray-400">Custom Decks</p>
-              <p className="text-xl font-bold text-purple-600">{progress.customDecks.length}</p>
+              <p className="text-sm text-gray-500 dark:text-gray-400">
+                Custom Decks
+              </p>
+              <p className="text-xl font-bold text-purple-600">
+                {progress.customDecks.length}
+              </p>
             </div>
           </div>
           <Button
@@ -122,7 +208,9 @@ export default function Flashcards() {
                   deck={deck}
                   cardCount={cards.length}
                   onSelect={() => setSelectedDeck(deck)}
-                  onDelete={deck.custom ? () => handleDeleteDeck(deck.id) : null}
+                  onDelete={
+                    deck.custom ? () => handleDeleteDeck(deck.id) : null
+                  }
                 />
               );
             })}
@@ -177,20 +265,22 @@ function DeckCard({ deck, cardCount, onSelect, onDelete }) {
         <h3 className="font-semibold text-gray-900 dark:text-white">
           {deck.name}
         </h3>
-        <p className="text-sm text-gray-500 dark:text-gray-400">{deck.nameVi}</p>
+        <p className="text-sm text-gray-500 dark:text-gray-400">
+          {deck.nameVi}
+        </p>
         <p className="text-xs text-gray-400 mt-2">{deck.description}</p>
 
         <div className="flex items-center justify-between mt-4">
-          <Badge variant={cardCount > 0 ? 'primary' : 'neutral'}>
+          <Badge variant={cardCount > 0 ? "primary" : "neutral"}>
             {cardCount} cards
           </Badge>
-          {deck.custom && (
-            <Badge variant="secondary">Custom</Badge>
-          )}
+          {deck.custom && <Badge variant="secondary">Custom</Badge>}
         </div>
 
         {cardCount === 0 && (
-          <p className="text-xs text-orange-500 mt-2">No cards in this deck yet</p>
+          <p className="text-xs text-orange-500 mt-2">
+            No cards in this deck yet
+          </p>
         )}
       </div>
     </Card>
@@ -210,7 +300,8 @@ function FlashcardStudy({ deck, cards, onBack, onReview }) {
   }, [cards]);
 
   const currentCard = shuffledCards[currentIndex];
-  const progress = ((knownCards.length + unknownCards.length) / shuffledCards.length) * 100;
+  const progress =
+    ((knownCards.length + unknownCards.length) / shuffledCards.length) * 100;
 
   const handleFlip = () => {
     setIsFlipped(!isFlipped);
@@ -270,11 +361,15 @@ function FlashcardStudy({ deck, cards, onBack, onReview }) {
 
           <div className="grid grid-cols-2 gap-4 mb-6">
             <div className="bg-green-50 dark:bg-green-900/20 rounded-lg p-4">
-              <p className="text-3xl font-bold text-green-600">{knownCards.length}</p>
+              <p className="text-3xl font-bold text-green-600">
+                {knownCards.length}
+              </p>
               <p className="text-sm text-green-600">Known</p>
             </div>
             <div className="bg-red-50 dark:bg-red-900/20 rounded-lg p-4">
-              <p className="text-3xl font-bold text-red-600">{unknownCards.length}</p>
+              <p className="text-3xl font-bold text-red-600">
+                {unknownCards.length}
+              </p>
               <p className="text-sm text-red-600">Need Review</p>
             </div>
           </div>
@@ -305,25 +400,39 @@ function FlashcardStudy({ deck, cards, onBack, onReview }) {
           ← Back
         </Button>
         <div className="text-center">
-          <h2 className="font-semibold text-gray-900 dark:text-white">{deck.name}</h2>
-          <p className="text-sm text-gray-500">{currentIndex + 1} / {shuffledCards.length}</p>
+          <h2 className="font-semibold text-gray-900 dark:text-white">
+            {deck.name}
+          </h2>
+          <p className="text-sm text-gray-500">
+            {currentIndex + 1} / {shuffledCards.length}
+          </p>
         </div>
         <div className="w-16" /> {/* Spacer */}
       </div>
 
       {/* Progress bar */}
-      <ProgressBar value={progress} max={100} size="md" color="gradient" className="mb-6" />
+      <ProgressBar
+        value={progress}
+        max={100}
+        size="md"
+        color="gradient"
+        className="mb-6"
+      />
 
       {/* Flashcard */}
       <div className="flip-card h-80 mb-6" onClick={handleFlip}>
-        <div className={`flip-card-inner w-full h-full ${isFlipped ? 'flipped' : ''}`}>
+        <div
+          className={`flip-card-inner w-full h-full ${isFlipped ? "flipped" : ""}`}
+        >
           {/* Front */}
           <Card className="flip-card-front absolute w-full h-full p-8 flex flex-col items-center justify-center cursor-pointer">
             <p className="text-sm text-gray-400 mb-2">Norwegian</p>
             <h3 className="text-4xl font-bold text-gray-900 dark:text-white mb-2">
               {currentCard.norwegian}
             </h3>
-            <p className="text-lg text-gray-400 italic">/{currentCard.pronunciation}/</p>
+            <p className="text-lg text-gray-400 italic">
+              /{currentCard.pronunciation}/
+            </p>
             <p className="text-sm text-gray-400 mt-6">Tap to reveal</p>
           </Card>
 
@@ -388,21 +497,21 @@ function FlashcardStudy({ deck, cards, onBack, onReview }) {
 }
 
 function CreateDeckForm({ onSubmit, onCancel }) {
-  const [name, setName] = useState('');
-  const [nameVi, setNameVi] = useState('');
-  const [description, setDescription] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('');
+  const [name, setName] = useState("");
+  const [nameVi, setNameVi] = useState("");
+  const [description, setDescription] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("");
   const [selectedWords, setSelectedWords] = useState([]);
 
   const filteredWords = selectedCategory
-    ? vocabulary.filter(w => w.category === selectedCategory)
+    ? vocabulary.filter((w) => w.category === selectedCategory)
     : vocabulary;
 
   const handleWordToggle = (wordId) => {
-    setSelectedWords(prev =>
+    setSelectedWords((prev) =>
       prev.includes(wordId)
-        ? prev.filter(id => id !== wordId)
-        : [...prev, wordId]
+        ? prev.filter((id) => id !== wordId)
+        : [...prev, wordId],
     );
   };
 
@@ -414,7 +523,7 @@ function CreateDeckForm({ onSubmit, onCancel }) {
       name: name.trim(),
       nameVi: nameVi.trim() || name.trim(),
       description: description.trim(),
-      icon: '📝',
+      icon: "📝",
       wordIds: selectedWords,
     });
   };
@@ -472,8 +581,10 @@ function CreateDeckForm({ onSubmit, onCancel }) {
           className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
         >
           <option value="">All Categories</option>
-          {vocabularyCategories.map(cat => (
-            <option key={cat.id} value={cat.id}>{cat.name}</option>
+          {vocabularyCategories.map((cat) => (
+            <option key={cat.id} value={cat.id}>
+              {cat.name}
+            </option>
           ))}
         </select>
       </div>
@@ -484,7 +595,7 @@ function CreateDeckForm({ onSubmit, onCancel }) {
           Select Words ({selectedWords.length} selected)
         </label>
         <div className="max-h-48 overflow-y-auto border border-gray-300 dark:border-gray-600 rounded-lg p-2 space-y-1">
-          {filteredWords.map(word => (
+          {filteredWords.map((word) => (
             <label
               key={word.id}
               className="flex items-center space-x-2 p-1 hover:bg-gray-50 dark:hover:bg-gray-700 rounded cursor-pointer"
@@ -495,7 +606,9 @@ function CreateDeckForm({ onSubmit, onCancel }) {
                 onChange={() => handleWordToggle(word.id)}
                 className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
               />
-              <span className="text-gray-900 dark:text-white text-sm">{word.norwegian}</span>
+              <span className="text-gray-900 dark:text-white text-sm">
+                {word.norwegian}
+              </span>
               <span className="text-gray-500 text-sm">- {word.vietnamese}</span>
             </label>
           ))}
