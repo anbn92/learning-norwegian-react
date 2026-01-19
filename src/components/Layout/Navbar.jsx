@@ -16,8 +16,8 @@ const navLinks = [
 
 const languages = [
   { code: "en", label: "English", flag: "EN" },
-  { code: "no", label: "Norsk", flag: "🇳🇴" },
-  { code: "vi", label: "Tiếng Việt", flag: "🇻🇳" },
+  { code: "no", label: "Norsk", flag: "NO" },
+  { code: "vi", label: "Tiếng Việt", flag: "VI" },
 ];
 
 export default function Navbar() {

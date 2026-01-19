@@ -207,7 +207,7 @@ export default function Dashboard() {
               <Link key={link.path} to={link.path}>
                 <Card className="p-4 h-full hover:scale-105 transition-transform">
                   <div
-                    className={`w-12 h-12 rounded-xl bg-gradient-to-r ${link.color} flex items-center justify-center text-2xl mb-3`}
+                    className={`w-12 h-12 rounded-xl bg-linear-to-r ${link.color} flex items-center justify-center text-2xl mb-3`}
                   >
                     {link.icon}
                   </div>
@@ -284,7 +284,7 @@ export default function Dashboard() {
           </Card>
 
           {/* Motivational Quote */}
-          <Card className="p-4 bg-gradient-to-br from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20">
+          <Card className="p-4 bg-linear-to-br from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20">
             <div className="text-center">
               <p className="text-lg font-medium text-gray-900 dark:text-white italic mb-2">
                 "{quote.quote}"
@@ -299,7 +299,7 @@ export default function Dashboard() {
           {/* Level Progress */}
           <Card className="p-4">
             <h3 className="font-semibold text-gray-900 dark:text-white mb-3">
-              Level Progress
+              {t("dashboard.levelProgress")}
             </h3>
             <div className="flex items-center space-x-4">
               <div
@@ -312,7 +312,7 @@ export default function Dashboard() {
                   {level.title}
                 </p>
                 <p className="text-sm text-gray-500 dark:text-gray-400 mb-2">
-                  {progress.totalPoints} points
+                  {progress.totalPoints} {t("dashboard.points")}
                 </p>
                 <ProgressBar
                   value={levelProgress.progress}
@@ -322,7 +322,7 @@ export default function Dashboard() {
                 />
                 {levelProgress.nextLevel && (
                   <p className="text-xs text-gray-400 mt-1">
-                    {levelProgress.pointsNeeded} points to{" "}
+                    {levelProgress.pointsNeeded} {t("dashboard.pointsTo")}{" "}
                     {levelProgress.nextLevel.title}
                   </p>
                 )}
@@ -333,12 +333,12 @@ export default function Dashboard() {
           {/* Quick Stats */}
           <Card className="p-4">
             <h3 className="font-semibold text-gray-900 dark:text-white mb-3">
-              Quick Stats
+              {t("dashboard.quickStats")}
             </h3>
             <div className="space-y-3">
               <div className="flex justify-between items-center">
                 <span className="text-sm text-gray-600 dark:text-gray-400">
-                  Flashcards Reviewed
+                  {t("dashboard.flashcardsReviewed")}
                 </span>
                 <span className="font-medium text-gray-900 dark:text-white">
                   {progress.flashcardsReviewed}
@@ -346,7 +346,7 @@ export default function Dashboard() {
               </div>
               <div className="flex justify-between items-center">
                 <span className="text-sm text-gray-600 dark:text-gray-400">
-                  Phrases Learned
+                  {t("dashboard.phrasesLearned")}
                 </span>
                 <span className="font-medium text-gray-900 dark:text-white">
                   {phrasesLearned}/{totalPhrases}
@@ -354,7 +354,7 @@ export default function Dashboard() {
               </div>
               <div className="flex justify-between items-center">
                 <span className="text-sm text-gray-600 dark:text-gray-400">
-                  Perfect Quizzes
+                  {t("dashboard.perfectQuizzes")}
                 </span>
                 <span className="font-medium text-gray-900 dark:text-white">
                   {progress.perfectQuizzes}
@@ -362,7 +362,7 @@ export default function Dashboard() {
               </div>
               <div className="flex justify-between items-center">
                 <span className="text-sm text-gray-600 dark:text-gray-400">
-                  Achievements
+                  {t("dashboard.achievements")}
                 </span>
                 <span className="font-medium text-gray-900 dark:text-white">
                   {progress.achievementsUnlocked.length}
